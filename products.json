@@ -1,0 +1,28 @@
+{
+  "digital": [
+    { "id": 1, "name": "Holiday Planner Bundle", "category": "Planners", "price": 12.99, "image": "🎄", "trending": true, "bestseller": true, "description": "Printable bundle for gifts, meals, and budgets.", "sku": "DIG-PLN-001" },
+    { "id": 2, "name": "Cricut Christmas Cut Files", "category": "SVG Files", "price": 8.99, "image": "✂️", "trending": true, "description": "10 festive SVGs for cards, mugs, tees.", "sku": "DIG-SVG-010" },
+    { "id": 3, "name": "Gift Tag Template Pack", "category": "Printables", "price": 4.99, "image": "🏷️", "bestseller": true, "description": "Editable tags in 4 styles (PDF/PNG).", "sku": "DIG-PRN-004" },
+    { "id": 4, "name": "Baby's First Christmas Ornament", "category": "DIY Kits", "price": 9.99, "image": "👶", "trending": true, "description": "Printable insert + cut template.", "sku": "DIG-DIY-001" },
+    { "id": 5, "name": "Budget Tracker Printables", "category": "Planners", "price": 7.99, "image": "💰", "trending": true, "description": "Monthly/weekly budgeting sheets.", "sku": "DIG-PLN-002" }
+  ],
+  "vault": [
+    { "id": 101, "name": "Vintage Recipe Box Labels", "category": "Kitchen", "price": 3.99, "image": "📦", "discount": "40%", "description": "Retro pantry & recipe labels set.", "sku": "VLT-KIT-001" },
+    { "id": 102, "name": "Classic Canning Labels", "category": "Kitchen", "price": 4.49, "image": "🫙", "discount": "35%", "description": "Jars, lids, and batch labels.", "sku": "VLT-KIT-002" },
+    { "id": 103, "name": "Farmhouse Wall Art Set", "category": "Home Decor", "price": 6.99, "image": "🖼️", "discount": "50%", "description": "4 printable signs (high-res).", "sku": "VLT-DEC-004" },
+    { "id": 104, "name": "Herb Garden Markers", "category": "Garden", "price": 3.49, "image": "🌿", "discount": "45%", "description": "Printable markers + silhouettes.", "sku": "VLT-GDN-003" }
+  ],
+  "apparel": [
+    { "id": 201, "name": "Matching Family PJs Set", "category": "Sleepwear", "price": 89.99, "image": "👕", "trending": true, "description": "Sizes for the whole crew.", "sku": "APP-PJS-SET" },
+    { "id": 202, "name": "Ugly Christmas Sweater", "category": "Sweaters", "price": 34.99, "image": "🎅", "bestseller": true, "description": "Comfy knit, loud print. Iconic.", "sku": "APP-SWT-UGLY" },
+    { "id": 203, "name": "Holiday Tumbler 20oz", "category": "Drinkware", "price": 19.99, "image": "🥤", "bestseller": true, "description": "Insulated, dishwasher safe.", "sku": "APP-DRK-020" },
+    { "id": 204, "name": "Custom Family Name Hoodie", "category": "Hoodies", "price": 39.99, "image": "🧥", "trending": true, "description": "Personalized print-on-demand.", "sku": "APP-HDY-CSTM" }
+  ],
+  "evergreen": [
+    { "name": "Weekly Meal Planner", "downloads": "125K+" },
+    { "name": "Budget Binder Sheets", "downloads": "98K+" },
+    { "name": "Chore Chart for Kids", "downloads": "87K+" },
+    { "name": "Password Tracker", "downloads": "76K+" },
+    { "name": "Habit Tracker Pages", "downloads": "65K+" }
+  ]
+}
