@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -19,310 +19,120 @@
 </head>
 <body class="bg-white text-gray-900">
   <div id="root"></div>
+  <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; color: #222;">
+    
+    <!-- HEADER -->
+    <h2 style="text-align: center; font-size: 26px; font-weight: bold; margin-bottom: 10px;">
+      AI SVG Generator
+    </h2>
+    <p style="text-align: center; font-size: 15px; color: #555; margin-bottom: 20px;">
+      Upload any image → Convert to Cricut-ready SVG → Download instantly
+    </p>
 
-  <!-- Your store, simplified to not need any npm packages -->
-  <script type="text/babel">
-    const {useState, useMemo} = React;
+    <!-- UPLOAD BOX -->
+    <div id="uploadArea" 
+         style="border: 2px dashed #ccc; padding: 30px; text-align: center; border-radius: 12px; cursor: pointer;">
+      <p style="margin:0; font-size: 16px; color: #666;">Click or Drag Image Here</p>
+      <input id="uploader" type="file" accept="image/*" style="display:none;">
+    </div>
 
-    function CraftCacheStore(){
-      const PAGES = ['home','vault','apparel'];
-      const [currentPage, setCurrentPage] = useState('home');
-      const [cart, setCart] = useState([]);
-      const [searchTerm, setSearchTerm] = useState('');
-      const [showCart, setShowCart] = useState(false);
-      const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    <!-- TOGGLES -->
+    <div style="margin-top: 20px;">
+      <label style="display:flex; align-items:center; margin-bottom:10px;">
+        <input type="checkbox" id="cleanMode" checked style="margin-right: 10px;">
+        Clean Line Art Mode (recommended)
+      </label>
+      <label style="display:flex; align-items:center;">
+        <input type="checkbox" id="holidayMode" style="margin-right: 10px;">
+        Holiday Style Mode (adds seasonal flair)
+      </label>
+    </div>
 
-      const navigateToPage = (p) => {
-        setCurrentPage(p);
-        window.scrollTo({top:0, behavior:'smooth'});
-        setMobileMenuOpen(false);
+    <!-- PREVIEW -->
+    <div id="previewContainer" style="margin-top: 25px; display:none;">
+      <p style="font-weight: bold; margin-bottom: 10px;">Preview:</p>
+      <img id="previewImage" src="" style="width:100%; border:1px solid #ccc; border-radius: 8px;">
+    </div>
+
+    <!-- PAYWALL -->
+    <div id="paywall" style="margin-top: 30px; display:none; text-align:center;">
+      <p style="font-size: 16px; margin-bottom: 12px;">Download Ready</p>
+
+      <a id="paypalButton"
+         href="PAYPAL_LINK_HERE"
+         target="_blank"
+         style="background:#0070ba; color:white; padding:12px 20px; 
+                border-radius:8px; text-decoration:none; font-weight: bold;
+                display:inline-block; margin-bottom:15px;">
+        Pay with PayPal – $2.99
+      </a>
+
+      <button id="unlockBtn"
+              style="background:#28a745; color:white; padding:12px 20px;
+                     border-radius:8px; border:none; font-size:15px; cursor:pointer;">
+        Unlock Download
+      </button>
+    </div>
+
+    <!-- DOWNLOAD SECTION -->
+    <div id="downloadSection" style="display:none; margin-top:25px; text-align:center;">
+      <a id="downloadLink"
+         href="#"
+         download="converted.svg"
+         style="background:#ff9800; color:white; padding:12px 20px;
+                border-radius:8px; text-decoration:none; font-weight:bold;">
+        Download SVG
+      </a>
+      <p style="margin-top:10px; font-size:13px; color:#666;">Thank you for supporting our shop ♥</p>
+    </div>
+
+    <!-- SCRIPT -->
+    <script>
+      const uploader = document.getElementById('uploader');
+      const uploadArea = document.getElementById('uploadArea');
+      const previewContainer = document.getElementById('previewContainer');
+      const previewImage = document.getElementById('previewImage');
+      const paywall = document.getElementById('paywall');
+      const unlockBtn = document.getElementById('unlockBtn');
+      const downloadSection = document.getElementById('downloadSection');
+      const downloadLink = document.getElementById('downloadLink');
+
+      uploadArea.onclick = () => uploader.click();
+
+      uploader.onchange = async () => {
+        const file = uploader.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = e => {
+          previewImage.src = e.target.result;
+          previewContainer.style.display = "block";
+          paywall.style.display = "block";
+        };
+        reader.readAsDataURL(file);
       };
 
-      // --- data (trimmed; add more later) ---
-      const mainProducts = [
-        { id: 1, name: 'Holiday Planner Bundle', category: 'Planners', price: 12.99, image: '🎄', trending: true, bestseller: true },
-        { id: 2, name: 'Cricut Christmas Cut Files', category: 'SVG Files', price: 8.99, image: '✂️', trending: true },
-        { id: 3, name: 'Gift Tag Template Pack', category: 'Printables', price: 4.99, image: '🏷️', bestseller: true },
-        { id: 4, name: "Baby's First Christmas Ornament", category: 'DIY Kits', price: 9.99, image: '👶', trending: true },
-      ];
-      const vaultProducts = [
-        { id: 101, name: 'Vintage Recipe Labels', category: 'Kitchen', price: 3.99, image: '📦', discount: '40%' },
-        { id: 102, name: 'Classic Canning Labels', category: 'Kitchen', price: 4.49, image: '🫙', discount: '35%' },
-        { id: 103, name: 'Farmhouse Wall Art Set', category: 'Home Decor', price: 6.99, image: '🖼️', discount: '50%' },
-      ];
-      const apparelProducts = [
-        { id: 201, name: 'Matching Family PJs Set', category: 'Sleepwear', price: 89.99, image: '👕', trending: true },
-        { id: 202, name: 'Ugly Christmas Sweater', category: 'Sweaters', price: 34.99, image: '🎅', bestseller: true },
-        { id: 203, name: 'Holiday Tumbler 20oz', category: 'Drinkware', price: 19.99, image: '🥤', bestseller: true },
-      ];
-      const evergreen = [
-        { name: 'Weekly Meal Planner', downloads: '125K+' },
-        { name: 'Budget Binder Sheets', downloads: '98K+' },
-        { name: 'Chore Chart for Kids', downloads: '87K+' },
-      ];
+      unlockBtn.onclick = async () => {
+        // This sends your image to your AI API
+        const endpoint = "API_ENDPOINT_HERE";
 
-      // --- cart ---
-      const addToCart = (p) => {
-        setCart(prev => {
-          const ex = prev.find(i => i.id===p.id);
-          return ex ? prev.map(i => i.id===p.id ? {...i, quantity:i.quantity+1} : i)
-                    : [...prev, {...p, quantity:1}];
-        });
+        const file = uploader.files[0];
+        const formData = new FormData();
+        formData.append("image", file);
+        formData.append("cleanMode", document.getElementById('cleanMode').checked);
+        formData.append("holidayMode", document.getElementById('holidayMode').checked);
+
+        const response = await fetch(endpoint, { method: "POST", body: formData });
+        const svg = await response.text();
+
+        const blob = new Blob([svg], { type: "image/svg+xml" });
+        downloadLink.href = URL.createObjectURL(blob);
+
+        downloadSection.style.display = "block";
+        unlockBtn.style.display = "none";
       };
-      const removeFromCart = (id) => setCart(prev => prev.filter(i => i.id!==id));
-      const updateQuantity = (id, d) => setCart(prev => prev.map(i => i.id===id? {...i, quantity: Math.max(1, i.quantity+d)}: i));
-      const cartTotal = useMemo(()=> cart.reduce((s,i)=> s+i.price*i.quantity,0),[cart]);
-      const cartCount = useMemo(()=> cart.reduce((s,i)=> s+i.quantity,0),[cart]);
+    </script>
 
-      // --- utils ---
-      const filterBySearch = (items) => {
-        const q = searchTerm.trim().toLowerCase();
-        if(!q) return items;
-        return items.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
-      };
-
-      // --- ui bits ---
-      const PillNav = () => (
-        <div className="flex justify-center gap-3 py-6">
-          {[1,2,3].map(n=>{
-            const page = n===1?'home':n===2?'vault':'apparel';
-            const active = currentPage===page;
-            return (
-              <button key={n}
-                onClick={()=>navigateToPage(page)}
-                className={`w-12 h-12 rounded-xl font-bold border ${active?'bg-gray-900 text-white border-gray-900':'bg-white text-gray-800 border-gray-300 hover:bg-gray-50'}`}>
-                {n}
-              </button>
-            );
-          })}
-        </div>
-      );
-
-      const NextPrev = () => {
-        const idx = PAGES.indexOf(currentPage);
-        const prev = PAGES[(idx-1+PAGES.length)%PAGES.length];
-        const next = PAGES[(idx+1)%PAGES.length];
-        const label = p => p==='home'?'Digital Shop':p==='vault'?'Legacy Vault':'Holiday Apparel';
-        return (
-          <div className="max-w-6xl mx-auto px-6 py-8">
-            <div className="flex flex-wrap justify-center gap-4">
-              <button onClick={()=>navigateToPage(prev)} className="bg-gray-200 hover:bg-gray-300 text-gray-900 px-6 py-3 rounded-lg font-semibold shadow-sm">← {label(prev)}</button>
-              <button onClick={()=>navigateToPage(next)} className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg">{label(next)} →</button>
-            </div>
-            <PillNav/>
-          </div>
-        );
-      };
-
-      const ProductCard = ({product, showDiscount=false}) => (
-        <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden">
-          <div className="relative bg-gradient-to-br from-amber-50 to-orange-50 h-40 flex items-center justify-center text-6xl">
-            <span aria-hidden>{product.image}</span>
-            {product.trending && <span className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold">TRENDING</span>}
-            {product.bestseller && <span className="absolute top-2 left-2 bg-amber-500 text-white text-xs px-2 py-1 rounded-full font-bold">BEST</span>}
-            {showDiscount && product.discount && <span className="absolute bottom-2 right-2 bg-green-600 text-white text-sm px-3 py-1 rounded-full font-bold">{product.discount} OFF</span>}
-          </div>
-          <div className="p-4">
-            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">{product.category}</p>
-            <h3 className="font-semibold text-gray-800 mb-2 line-clamp-2">{product.name}</h3>
-            <div className="flex items-center justify-between">
-              <span className="text-xl font-bold">${product.price}</span>
-              <button onClick={()=>addToCart(product)} className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-medium">Add to Cart</button>
-            </div>
-          </div>
-        </div>
-      );
-
-      const CartSidebar = () => (
-        <div className={`fixed right-0 top-0 h-full w-96 max-w-[90vw] bg-white shadow-2xl transform transition-transform duration-300 z-50 ${showCart ? 'translate-x-0' : 'translate-x-full'}`}>
-          <div className="p-6 border-b flex justify-between items-center">
-            <h2 className="text-2xl font-bold">Your Cart ({cartCount})</h2>
-            <button onClick={()=>setShowCart(false)} className="text-gray-500 hover:text-gray-700">✕</button>
-          </div>
-          <div className="p-6 overflow-y-auto h-[calc(100vh-200px)]">
-            {cart.length===0 ? <p className="text-gray-500 text-center py-8">Your cart is empty</p> :
-              cart.map(item=>(
-                <div key={item.id} className="flex items-center gap-4 mb-4 pb-4 border-b">
-                  <div className="text-4xl">{item.image}</div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-sm">{item.name}</h3>
-                    <p className="text-gray-600">${item.price}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <button onClick={()=>updateQuantity(item.id, -1)} className="bg-gray-200 px-2 py-1 rounded">-</button>
-                      <span>{item.quantity}</span>
-                      <button onClick={()=>updateQuantity(item.id, 1)} className="bg-gray-200 px-2 py-1 rounded">+</button>
-                    </div>
-                  </div>
-                  <button onClick={()=>removeFromCart(item.id)} className="text-red-500 hover:text-red-700">✕</button>
-                </div>
-              ))
-            }
-          </div>
-          {cart.length>0 && (
-            <div className="absolute bottom-0 left-0 right-0 p-6 bg-gray-50 border-t">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-lg font-semibold">Total:</span>
-                <span className="text-2xl font-bold">${cartTotal.toFixed(2)}</span>
-              </div>
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold mb-2">
-                PayPal Checkout
-              </button>
-              <p className="text-xs text-center text-gray-500">Secure payment via PayPal</p>
-            </div>
-          )}
-        </div>
-      );
-
-      // Pages
-      const HomePage = () => (
-        <div>
-          <div className="relative bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 py-16 px-6 mb-12">
-            <div className="max-w-6xl mx-auto text-center">
-              <h1 className="text-6xl font-bold mb-4">Craft Cache</h1>
-              <p className="text-lg text-gray-600 mb-6">Quality digital crafts & printables for families who create together</p>
-              <div className="flex gap-4 justify-center">
-                <button className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-lg font-semibold">Shop New Arrivals</button>
-                <button className="bg-white hover:bg-gray-50 text-gray-800 px-6 py-3 rounded-lg font-semibold border-2 border-gray-200">Browse Bestsellers</button>
-              </div>
-            </div>
-          </div>
-
-          <div className="max-w-6xl mx-auto px-6 mb-10">
-            <h2 className="text-2xl font-bold mb-4">Always Popular</h2>
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {evergreen.map((item,idx)=>(
-                  <div key={idx} className="bg-white rounded-lg p-4 shadow-sm">
-                    <p className="font-semibold text-gray-800 text-sm mb-2">{item.name}</p>
-                    <p className="text-xs text-gray-500">{item.downloads} downloads</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="max-w-6xl mx-auto px-6 mb-12">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold">Featured Digital Products</h2>
-              <input value={searchTerm} onChange={(e)=>setSearchTerm(e.target.value)}
-                     placeholder="Search products…" className="border-2 border-gray-200 rounded-lg px-3 py-2 text-sm"/>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {filterBySearch(mainProducts).map(p => <ProductCard key={p.id} product={p} />)}
-            </div>
-          </div>
-
-          <div className="max-w-6xl mx-auto px-6 py-10 border-t">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
-              <div><div className="text-4xl mb-2">⚡</div><h3 className="font-semibold mb-1">Instant Download</h3><p className="text-sm text-gray-600">Access immediately after purchase</p></div>
-              <div><div className="text-4xl mb-2">💝</div><h3 className="font-semibold mb-1">Family Tested</h3><p className="text-sm text-gray-600">Designed by parents, for parents</p></div>
-              <div><div className="text-4xl mb-2">🎨</div><h3 className="font-semibold mb-1">Easy to Use</h3><p className="text-sm text-gray-600">Print at home or use digitally</p></div>
-              <div><div className="text-4xl mb-2">💰</div><h3 className="font-semibold mb-1">15% Below Average</h3><p className="text-sm text-gray-600">Quality shouldn't break the bank</p></div>
-            </div>
-          </div>
-
-          <NextPrev/>
-        </div>
-      );
-
-      const VaultPage = () => (
-        <div>
-          <div className="relative bg-gradient-to-br from-stone-100 via-amber-50 to-orange-50 py-12 px-6 mb-10">
-            <div className="max-w-6xl mx-auto">
-              <h1 className="text-5xl font-bold mb-3">Craft Cache Legacy Vault</h1>
-              <p className="text-lg text-gray-600">Timeless treasures at discount prices.</p>
-            </div>
-          </div>
-          <div className="max-w-6xl mx-auto px-6 mb-12">
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {filterBySearch(vaultProducts).map(p => <ProductCard key={p.id} product={p} showDiscount/>)}
-            </div>
-          </div>
-          <NextPrev/>
-        </div>
-      );
-
-      const ApparelPage = () => (
-        <div>
-          <div className="relative bg-gradient-to-br from-purple-100 via-pink-100 to-red-100 py-16 px-6 mb-10">
-            <div className="max-w-6xl mx-auto text-center">
-              <h1 className="text-6xl font-black mb-4">LOCK IN ON YOURSELF THIS SEASON</h1>
-              <p className="text-lg text-gray-700 font-semibold">🔥 Holiday Drip • Family Matching 🔥</p>
-            </div>
-          </div>
-          <div className="max-w-6xl mx-auto px-6 mb-12">
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {filterBySearch(apparelProducts).map(p => <ProductCard key={p.id} product={p} />)}
-            </div>
-          </div>
-          <NextPrev/>
-        </div>
-      );
-
-      // render
-      return (
-        <div className="min-h-screen bg-white">
-          {/* Header */}
-          <header className="sticky top-0 z-40 bg-white shadow-md">
-            <div className="max-w-7xl mx-auto px-6 py-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-6">
-                  <h1 className="text-2xl font-bold cursor-pointer" onClick={()=>navigateToPage('home')}>Craft Cache</h1>
-                  <nav className="hidden md:flex gap-6">
-                    <button onClick={()=>navigateToPage('home')} className={`font-semibold ${currentPage==='home'?'text-amber-600':'text-gray-600 hover:text-gray-800'}`}>Digital Shop</button>
-                    <button onClick={()=>navigateToPage('vault')} className={`font-semibold ${currentPage==='vault'?'text-amber-600':'text-gray-600 hover:text-gray-800'}`}>Legacy Vault</button>
-                    <button onClick={()=>navigateToPage('apparel')} className={`font-semibold ${currentPage==='apparel'?'text-amber-600':'text-gray-600 hover:text-gray-800'}`}>Holiday Apparel</button>
-                  </nav>
-                </div>
-                <div className="flex items-center gap-3">
-                  <input value={searchTerm} onChange={(e)=>setSearchTerm(e.target.value)} placeholder="Search…" className="hidden md:block bg-gray-100 rounded-lg px-3 py-2 text-sm w-48" />
-                  <button onClick={()=>setShowCart(true)} className="relative p-2 hover:bg-gray-100 rounded-lg">🛒
-                    {cartCount>0 && <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">{cartCount}</span>}
-                  </button>
-                  <button onClick={()=>setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden p-2">{mobileMenuOpen?'✕':'☰'}</button>
-                </div>
-              </div>
-
-              {mobileMenuOpen && (
-                <div className="md:hidden mt-4 pb-4 border-t pt-4">
-                  <nav className="flex flex-col gap-3">
-                    <button onClick={()=>navigateToPage('home')} className="text-left py-2 font-semibold">Digital Shop</button>
-                    <button onClick={()=>navigateToPage('vault')} className="text-left py-2 font-semibold">Legacy Vault</button>
-                    <button onClick={()=>navigateToPage('apparel')} className="text-left py-2 font-semibold">Holiday Apparel</button>
-                  </nav>
-                </div>
-              )}
-            </div>
-          </header>
-
-          {/* Main */}
-          <main>
-            {currentPage==='home' && <HomePage/>}
-            {currentPage==='vault' && <VaultPage/>}
-            {currentPage==='apparel' && <ApparelPage/>}
-          </main>
-
-          {/* Footer */}
-          <footer className="bg-gray-900 text-white py-10 px-6 mt-12">
-            <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
-              <div><h3 className="font-bold text-xl mb-4">Craft Cache</h3><p className="text-gray-400 text-sm">Quality crafts for families who create together.</p></div>
-              <div><h4 className="font-semibold mb-3">Shop</h4><ul className="space-y-2 text-sm text-gray-400"><li>Digital Products</li><li>Legacy Vault</li><li>Apparel</li></ul></div>
-              <div><h4 className="font-semibold mb-3">Support</h4><ul className="space-y-2 text-sm text-gray-400"><li>FAQ</li><li>Shipping</li><li>Returns</li></ul></div>
-              <div><h4 className="font-semibold mb-3">Connect</h4><ul className="space-y-2 text-sm text-gray-400"><li>Contact Us</li><li>Pinterest</li><li>Instagram</li></ul></div>
-            </div>
-            <div className="max-w-6xl mx-auto mt-8 pt-6 border-t border-gray-800 text-center text-sm text-gray-400">
-              <p>© 2025 Craft Cache. Making holidays affordable, one craft at a time.</p>
-            </div>
-          </footer>
-
-          <CartSidebar/>
-          {showCart && <button onClick={()=>setShowCart(false)} className="fixed inset-0 bg-black/50 z-40" aria-label="Close cart overlay"></button>}
-        </div>
-      );
-    }
-
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<CraftCacheStore />);
-  </script>
+  </div>
 </body>
 </html>
